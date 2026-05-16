@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="todoApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow Pro</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
+</head>
+
+<body ng-controller="TodoController">
+
+    <div class="background-glow"></div>
+
+    <div class="app-container">
+
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <div>
+                <h1>To DO App</h1>
+                <p>Smart productivity dashboard</p>
+            </div>
+
+            <div class="task-count">
+                {{tasks.length}} Tasks
+            </div>
+        </div>
+
+        <!-- INPUT SECTION -->
+        <div class="task-input-section">
+
+            <input type="text"
+                   ng-model="newTask.title"
+                   placeholder="Enter task title">
+
+            <textarea ng-model="newTask.description"
+                      placeholder="Task description"></textarea>
+
+            <select ng-model="newTask.priority">
+                <option value="High">High Priority</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="Low">Low Priority</option>
+            </select>
+
+            <button ng-click="addTask()">
+                + Create Task
+            </button>
+
+        </div>
+
+        <!-- FILTER SECTION -->
+        <div class="filter-section">
+
+            <button ng-click="filterStatus='all'">All</button>
+            <button ng-click="filterStatus='completed'">Completed</button>
+            <button ng-click="filterStatus='pending'">Pending</button>
+
+        </div>
+
+        <!-- TASK LIST -->
+        <div class="task-grid">
+
+            <div class="task-card"
+                 ng-repeat="task in tasks | filter:taskFilter"
+                 ng-class="{'done': task.status}">
+
+                <!-- TOP -->
+                <div class="card-top">
+
+                    <div class="status-section">
+
+                        <input type="checkbox"
+                               ng-model="task.status"
+                               ng-change="updateTask(task)">
+
+                        <span>
+                            {{task.status ? 'Completed' : 'In Progress'}}
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <!-- BODY -->
+                <div class="card-body">
+
+                    <!-- PRIORITY BADGE -->
+                    <div class="priority-tag {{task.priority.toLowerCase()}}">
+                        {{task.priority}} Priority
+                    </div>
+
+                    <!-- TITLE -->
+                    <h2 ng-if="!task.editing">
+                        {{task.title}}
+                    </h2>
+
+                    <input class="edit-field"
+                           ng-if="task.editing"
+                           ng-model="task.title"
+                           ng-disabled="task.status == 1">
+
+                    <!-- DESCRIPTION -->
+                    <p ng-if="!task.editing">
+                        {{task.description}}
+                    </p>
+
+                    <textarea class="edit-field"
+                              ng-if="task.editing"
+                              ng-model="task.description"
+                              ng-disabled="task.status == 1"></textarea>
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="card-actions">
+
+                    <!-- EDIT -->
+                    <button class="edit"
+                            ng-click="task.status == 0 && (task.editing = !task.editing)"
+                            ng-disabled="task.status == 1">
+                        Edit
+                    </button>
+
+                    <!-- SAVE -->
+                    <button class="save"
+                            ng-if="task.editing && task.status == 0"
+                            ng-click="updateTask(task)">
+                        Save
+                    </button>
+
+                    <!-- DELETE -->
+                    <button class="delete"
+                            ng-click="deleteTask(task.id)">
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

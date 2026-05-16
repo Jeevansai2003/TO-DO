@@ -1,0 +1,268 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#0f172a;
+    min-height:100vh;
+    color:white;
+    overflow-x:hidden;
+}
+
+.background-glow{
+    position:fixed;
+    width:500px;
+    height:500px;
+    background:linear-gradient(135deg,#7c3aed,#06b6d4);
+    filter:blur(120px);
+    top:-100px;
+    left:-100px;
+    opacity:0.4;
+    z-index:0;
+}
+
+.app-container{
+    position:relative;
+    z-index:1;
+    width:90%;
+    max-width:1200px;
+    margin:auto;
+    padding:40px 0;
+}
+
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.top-bar h1{
+    font-size:42px;
+    font-weight:600;
+}
+
+.top-bar p{
+    color:#94a3b8;
+    margin-top:5px;
+}
+
+.task-count{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.1);
+    padding:12px 20px;
+    border-radius:14px;
+    backdrop-filter:blur(10px);
+    font-size:18px;
+}
+
+.task-input-section{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(15px);
+    border-radius:24px;
+    padding:30px;
+    margin-bottom:40px;
+}
+
+.task-input-section input,
+.task-input-section textarea{
+    width:100%;
+    background:#111827;
+    border:none;
+    color:white;
+    padding:16px;
+    border-radius:14px;
+    margin-bottom:20px;
+    font-size:16px;
+    outline:none;
+}
+
+.task-input-section textarea{
+    resize:none;
+    height:100px;
+}
+
+.task-input-section button{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#7c3aed,#06b6d4);
+    color:white;
+    font-size:17px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.task-input-section button:hover{
+    transform:translateY(-2px);
+    opacity:0.9;
+}
+
+.task-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:25px;
+}
+
+.task-card{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(15px);
+    border-radius:24px;
+    padding:24px;
+    transition:0.4s;
+    position:relative;
+    overflow:hidden;
+}
+
+
+
+.task-card:hover{
+    transform:translateY(-6px);
+    border-color:#06b6d4;
+}
+
+.card-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.status-section{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#cbd5e1;
+    font-size:14px;
+}
+
+.date{
+    color:#94a3b8;
+    font-size:14px;
+}
+
+.card-body h2{
+    font-size:24px;
+    margin-bottom:10px;
+}
+
+.card-body p{
+    color:#cbd5e1;
+    line-height:1.6;
+}
+
+.card-actions{
+    display:flex;
+    gap:12px;
+    margin-top:25px;
+}
+
+.card-actions button{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    color:white;
+    font-weight:500;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.edit{
+    background:#f59e0b;
+}
+
+.save{
+    background:#10b981;
+}
+
+.delete{
+    background:#ef4444;
+}
+
+.card-actions button:hover{
+    transform:scale(1.05);
+}
+
+.done{
+    opacity:0.6;
+}
+
+.done h2,
+.done p{
+    text-decoration:line-through;
+}
+
+.edit-field{
+    width:100%;
+    background:#111827;
+    border:none;
+    color:white;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:10px;
+    outline:none;
+}
+
+.task-input-section select{
+    width:100%;
+    background:#111827;
+    border:none;
+    color:white;
+    padding:16px;
+    border-radius:14px;
+    margin-bottom:20px;
+    font-size:16px;
+    outline:none;
+}
+
+.priority-tag{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    margin-bottom:15px;
+    font-weight:600;
+}
+
+.high{
+    background:#ef4444;
+}
+
+.medium{
+    background:#f59e0b;
+}
+
+.low{
+    background:#10b981;
+}
+
+.filter-section{
+    display:flex;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.filter-section button{
+    padding:12px 20px;
+    border:none;
+    border-radius:12px;
+    background:#1e293b;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.filter-section button:hover{
+    background:#06b6d4;
+}   
+
