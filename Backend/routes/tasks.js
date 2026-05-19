@@ -4,13 +4,30 @@ const db = require("../db");
 
 
 // =======================
-// GET ALL TASKS
+// GET ACTIVE TASKS
 // =======================
 router.get("/", (req, res) => {
-    db.query("SELECT * FROM tasks", (err, results) => {
-        if (err) return res.status(500).send(err);
-        res.json(results);
-    });
+    db.query(
+        "SELECT * FROM tasks WHERE deleted=0",
+        (err, results) => {
+            if (err) return res.status(500).send(err);
+            res.json(results);
+        }
+    );
+});
+
+
+// =======================
+// GET RECYCLE BIN TASKS
+// =======================
+router.get("/recycle-bin", (req, res) => {
+    db.query(
+        "SELECT * FROM tasks WHERE deleted=1",
+        (err, results) => {
+            if (err) return res.status(500).send(err);
+            res.json(results);
+        }
+    );
 });
 
 
@@ -19,16 +36,20 @@ router.get("/", (req, res) => {
 // =======================
 router.post("/", (req, res) => {
 
-    let { title, description, priority } = req.body;
+    let { title, description, priority, due_date } = req.body;
 
-    // DEFAULT PRIORITY SAFETY
     if (!priority) {
         priority = "Medium";
     }
 
+    // SAFE DATE CONVERSION
+    let safeDueDate = due_date
+        ? new Date(due_date).toISOString().split("T")[0]
+        : null;
+
     db.query(
-        "INSERT INTO tasks (title, description, priority) VALUES (?, ?, ?)",
-        [title, description, priority],
+        "INSERT INTO tasks (title, description, priority, due_date, deleted) VALUES (?, ?, ?, ?, 0)",
+        [title, description, priority, safeDueDate],
         (err, result) => {
             if (err) return res.status(500).send(err);
 
@@ -46,11 +67,10 @@ router.post("/", (req, res) => {
 // =======================
 router.put("/:id", (req, res) => {
 
-    const { title, description, status, priority } = req.body;
+    const { title, description, status, priority, due_date } = req.body;
 
-    // Step 1: check if task exists + status
     db.query(
-        "SELECT status FROM tasks WHERE id=?",
+        "SELECT status FROM tasks WHERE id=? AND deleted=0",
         [req.params.id],
         (err, result) => {
 
@@ -62,19 +82,24 @@ router.put("/:id", (req, res) => {
                 });
             }
 
-            // Step 2: block update if completed
+            // BLOCK IF COMPLETED
             if (result[0].status == 1) {
                 return res.status(403).json({
                     message: "Completed tasks cannot be edited"
                 });
             }
 
-            // Step 3: safe update
             let safePriority = priority || "Medium";
 
+            let safeDueDate = due_date
+                ? new Date(due_date).toISOString().split("T")[0]
+                : null;
+
             db.query(
-                "UPDATE tasks SET title=?, description=?, status=?, priority=? WHERE id=?",
-                [title, description, status, safePriority, req.params.id],
+                `UPDATE tasks 
+                 SET title=?, description=?, status=?, priority=?, due_date=? 
+                 WHERE id=?`,
+                [title, description, status, safePriority, safeDueDate, req.params.id],
                 (err) => {
                     if (err) return res.status(500).send(err);
 
@@ -89,18 +114,37 @@ router.put("/:id", (req, res) => {
 
 
 // =======================
-// DELETE TASK
+// SOFT DELETE (MOVE TO RECYCLE BIN)
 // =======================
 router.delete("/:id", (req, res) => {
 
     db.query(
-        "DELETE FROM tasks WHERE id=?",
+        "UPDATE tasks SET deleted=1 WHERE id=?",
         [req.params.id],
         (err) => {
             if (err) return res.status(500).send(err);
 
             res.json({
-                message: "Task deleted"
+                message: "Moved to recycle bin"
+            });
+        }
+    );
+});
+
+
+// =======================
+// RESTORE TASK FROM RECYCLE BIN
+// =======================
+router.put("/restore/:id", (req, res) => {
+
+    db.query(
+        "UPDATE tasks SET deleted=0 WHERE id=?",
+        [req.params.id],
+        (err) => {
+            if (err) return res.status(500).send(err);
+
+            res.json({
+                message: "Task restored successfully"
             });
         }
     );

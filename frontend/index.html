@@ -26,12 +26,20 @@
             </div>
 
             <div class="task-count">
-                {{tasks.length}} Tasks
+                {{filtered.length}} Tasks
             </div>
         </div>
 
+
+        <!-- VIEW SWITCH -->
+        <div class="filter-section">
+            <button ng-click="showActive()">Active Tasks</button>
+            <button ng-click="showRecycleBin()">Recycle Bin</button>
+        </div>
+
+
         <!-- INPUT SECTION -->
-        <div class="task-input-section">
+        <div class="task-input-section" ng-if="view=='active'">
 
             <input type="text"
                    ng-model="newTask.title"
@@ -39,6 +47,9 @@
 
             <textarea ng-model="newTask.description"
                       placeholder="Task description"></textarea>
+
+            <input type="date"
+                   ng-model="newTask.due_date">
 
             <select ng-model="newTask.priority">
                 <option value="High">High Priority</option>
@@ -52,43 +63,68 @@
 
         </div>
 
-        <!-- FILTER SECTION -->
-        <div class="filter-section">
 
-            <button ng-click="filterStatus='all'">All</button>
-            <button ng-click="filterStatus='completed'">Completed</button>
-            <button ng-click="filterStatus='pending'">Pending</button>
+        <!-- FILTER BUTTONS -->
+        <div class="filter-section" ng-if="view=='active'">
+
+            <button ng-click="showAll()">All</button>
+
+            <button ng-click="showCompleted()">
+                Completed
+            </button>
+
+            <button ng-click="showPending()">
+                Pending
+            </button>
+
+            <button ng-click="showCancelled()">
+                Cancelled
+            </button>
 
         </div>
+
 
         <!-- TASK LIST -->
         <div class="task-grid">
 
             <div class="task-card"
-                 ng-repeat="task in tasks | filter:taskFilter"
-                 ng-class="{'done': task.status}">
+                 ng-repeat="task in filtered"
+                 ng-class="{
+                    'done': task.status == 1 || task.status == '1',
+                    'cancelled': task.status == 2 || task.status == '2'
+                 }">
 
                 <!-- TOP -->
                 <div class="card-top">
 
-                    <div class="status-section">
+                    <div class="status-section" ng-if="view=='active'">
 
                         <input type="checkbox"
-                               ng-model="task.status"
-                               ng-change="updateTask(task)">
+                               ng-if="task.status != 2 && task.status != '2'"
+                               ng-checked="task.status == 1 || task.status == '1'"
+                               ng-click="toggleComplete(task)">
 
-                        <span>
-                            {{task.status ? 'Completed' : 'In Progress'}}
+                        <span ng-if="task.status == 0 || task.status == '0'">
+                            In Progress
+                        </span>
+
+                        <span ng-if="task.status == 1 || task.status == '1'">
+                            Completed
+                        </span>
+
+                        <span ng-if="task.status == 2 || task.status == '2'">
+                            Cancelled
                         </span>
 
                     </div>
 
                 </div>
 
+
                 <!-- BODY -->
                 <div class="card-body">
 
-                    <!-- PRIORITY BADGE -->
+                    <!-- PRIORITY -->
                     <div class="priority-tag {{task.priority.toLowerCase()}}">
                         {{task.priority}} Priority
                     </div>
@@ -99,9 +135,10 @@
                     </h2>
 
                     <input class="edit-field"
-                           ng-if="task.editing"
+                           ng-if="task.editing && view=='active'"
                            ng-model="task.title"
-                           ng-disabled="task.status == 1">
+                           ng-disabled="task.status != 0 && task.status != '0'">
+
 
                     <!-- DESCRIPTION -->
                     <p ng-if="!task.editing">
@@ -109,34 +146,62 @@
                     </p>
 
                     <textarea class="edit-field"
-                              ng-if="task.editing"
+                              ng-if="task.editing && view=='active'"
                               ng-model="task.description"
-                              ng-disabled="task.status == 1"></textarea>
+                              ng-disabled="task.status != 0 && task.status != '0'">
+                    </textarea>
+
+
+                    <!-- DUE DATE -->
+                    <div class="task-date">
+                        📅 Due Date:
+                        {{task.due_date | date:'dd-MM-yyyy'}}
+                    </div>
 
                 </div>
+
 
                 <!-- ACTIONS -->
                 <div class="card-actions">
 
-                    <!-- EDIT -->
-                    <button class="edit"
-                            ng-click="task.status == 0 && (task.editing = !task.editing)"
-                            ng-disabled="task.status == 1">
-                        Edit
-                    </button>
+                    <!-- ACTIVE VIEW -->
+                    <div ng-if="view=='active'">
 
-                    <!-- SAVE -->
-                    <button class="save"
-                            ng-if="task.editing && task.status == 0"
-                            ng-click="updateTask(task)">
-                        Save
-                    </button>
+                        <button class="edit"
+                                ng-click="task.status == 0 || task.status == '0' ? (task.editing = true) : null"
+                                ng-disabled="task.status != 0 && task.status != '0'">
+                            Edit
+                        </button>
 
-                    <!-- DELETE -->
-                    <button class="delete"
-                            ng-click="deleteTask(task.id)">
-                        Delete
-                    </button>
+                        <button class="save"
+                                ng-if="task.editing && (task.status == 0 || task.status == '0')"
+                                ng-click="updateTask(task)">
+                            Save
+                        </button>
+
+                        <button class="delete"
+                                ng-click="deleteTask(task.id)">
+                            Delete
+                        </button>
+
+                        <button class="cancel"
+                                ng-click="markCancelled(task)"
+                                ng-disabled="task.status != 0 && task.status != '0'">
+                            Cancel Task
+                        </button>
+
+                    </div>
+
+
+                    <!-- RECYCLE BIN -->
+                    <div ng-if="view=='recycle'">
+
+                        <button class="save"
+                                ng-click="restoreTask(task.id)">
+                            Restore
+                        </button>
+
+                    </div>
 
                 </div>
 
